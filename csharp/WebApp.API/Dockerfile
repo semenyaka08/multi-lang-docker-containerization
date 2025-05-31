@@ -1,5 +1,10 @@
-﻿FROM mcr.microsoft.com/dotnet/sdk:8.0
+﻿FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+WORKDIR /app
+EXPOSE 8080
+EXPOSE 8081
 
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
 COPY ["WebApp.API.csproj", "./WebApp.API.csproj"] 
@@ -7,12 +12,14 @@ RUN dotnet restore "WebApp.API.csproj"
 
 COPY . .
 
-RUN dotnet build "WebApp.API.csproj" -c Release
-RUN dotnet publish "WebApp.API.csproj" -c Release -o /app/publish_output
+RUN dotnet build "WebApp.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
-WORKDIR /app/publish_output
+FROM build AS publish
+ARG BUILD_CONFIGURATION=Release
+WORKDIR /src 
+RUN dotnet publish "WebApp.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
-EXPOSE 8080
-EXPOSE 8081
-
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "WebApp.API.dll"]
