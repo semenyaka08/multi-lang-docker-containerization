@@ -1,0 +1,25 @@
+﻿services:
+  webapp.api:
+    image: webapp.api
+    build:
+      context: .
+      dockerfile: WebApp.API/Dockerfile
+    ports:
+      - "6545:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: 8080
+      ConnectionStrings__DefaultConnection: Server = taskNotesDb;Database = TaskNotesDb;User Id=sa;Password=Serhiy0808;Encrypt=True;TrustServerCertificate=true
+    depends_on:
+      taskNotesDb:
+        condition: service_started
+        
+  taskNotesDb:
+    image: mcr.microsoft.com/mssql/server
+    container_name: petsDb
+    restart: always
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Serhiy0808
+    ports:
+      - "1433:1433"
