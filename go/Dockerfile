@@ -11,7 +11,7 @@ COPY . .
 
 RUN CGO_ENABLED=0 GOOS=linux go build -a -ldflags '-extldflags "-static"' -o /app/mygoapp .
 
-FROM scratch
+FROM gcr.io/distroless/static-debian12
 
 WORKDIR /app
 
