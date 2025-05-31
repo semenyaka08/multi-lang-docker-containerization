@@ -1,23 +1,22 @@
-FROM python:3.10-alpine
+FROM python:3.10-bullseye
 
 WORKDIR /app
-
-RUN apk add --no-cache \
-    gcc \
-    musl-dev \
-    linux-headers \
-    && rm -rf /var/cache/apk/*
 
 RUN pip install --upgrade pip
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-RUN apk del gcc musl-dev linux-headers
+RUN mkdir -p spaceship/routers
 
 COPY build/ ./build/
 
-COPY spaceship/ ./spaceship/
+COPY spaceship/__init__.py ./spaceship/
+COPY spaceship/config.py ./spaceship/
+
+COPY spaceship/routers/ ./spaceship/routers/
+
+COPY spaceship/app.py ./spaceship/
 COPY spaceship/main.py .
 
 EXPOSE 8080
