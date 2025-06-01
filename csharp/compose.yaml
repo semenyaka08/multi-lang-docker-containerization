@@ -16,7 +16,7 @@
         
   taskNotesDb:
     image: mcr.microsoft.com/mssql/server
-    container_name: petsDb
+    container_name: taskNotesDb
     restart: always
     environment:
       - ACCEPT_EULA=Y
